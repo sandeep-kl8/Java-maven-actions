@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Say Hello
-        run: echo "Hello World from GitHub Actions 🚀"
+        run: echo "Hello World "
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
