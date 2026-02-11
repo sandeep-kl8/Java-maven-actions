@@ -1,4 +1,4 @@
-name: Maven CI
+name: Hello Workflow
 
 on:
   push:
@@ -12,12 +12,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Say Hello
+        run: echo "Hello World from GitHub Actions 🚀"
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
           cache: maven
-
-      - name: Build with Maven
-        run: mvn clean package
