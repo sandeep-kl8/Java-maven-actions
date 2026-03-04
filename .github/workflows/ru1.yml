@@ -1,6 +1,6 @@
 name: RU1 Build
 
-on:
+on:    
   workflow_dispatch:
   push:
     paths:
