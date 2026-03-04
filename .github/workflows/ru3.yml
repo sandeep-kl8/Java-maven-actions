@@ -1,0 +1,28 @@
+name: RU3 Build
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'ru3/**'
+
+jobs:
+  build-ru3:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build RU3
+        run: mvn -pl ru3 -am clean install
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ru3-artifact
+          path: ru3/target/
