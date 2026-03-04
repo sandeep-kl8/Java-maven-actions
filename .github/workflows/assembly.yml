@@ -1,0 +1,47 @@
+name: Assembly Build
+
+on:
+  workflow_run:
+    workflows: ["RU1 Build", "RU2 Build", "RU3 Build"]
+    types:
+      - completed
+
+jobs:
+  assembly:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Download RU1 Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ru1-artifact
+          path: artifacts/ru1
+
+      - name: Download RU2 Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ru2-artifact
+          path: artifacts/ru2
+
+      - name: Download RU3 Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ru3-artifact
+          path: artifacts/ru3
+
+      - name: Run Assembly
+        run: |
+          mvn -pl assembly clean package
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: assembly-artifact
+          path: assembly/target/
