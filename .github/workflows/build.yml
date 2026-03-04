@@ -1,97 +1,112 @@
-name: Hello World Structured Pipeline
+name: Multi Module Pipeline
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
 
-  # -------------------------------
-  # Parallel RU Builds
-  # -------------------------------
-
-  build_ru_1:
+  build-ru1:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Build RU 1
-        run: |
-          echo "Building RU 1..."
-          echo "RU1 artifact" > ru1.txt
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
 
-      - name: Upload RU1 artifact
+      - name: Build RU1
+        run: mvn -B clean install -pl ru1 -am
+
+      - name: Upload RU1 Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ru1
-          path: ru1.txt
+          path: ru1/target/*.jar
 
-  build_ru_2:
+
+  build-ru2:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Build RU 2
-        run: |
-          echo "Building RU 2..."
-          echo "RU2 artifact" > ru2.txt
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
 
-      - name: Upload RU2 artifact
+      - name: Build RU2
+        run: mvn -B clean install -pl ru2 -am
+
+      - name: Upload RU2 Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ru2
-          path: ru2.txt
+          path: ru2/target/*.jar
 
-  # -------------------------------
-  # Assembly Job (Runs After RUs)
-  # -------------------------------
 
-  assemble:
+  build-ru3:
     runs-on: ubuntu-latest
-    needs: [build_ru_1, build_ru_2]
 
     steps:
-      - name: Download RU1
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
         with:
-          name: ru1
+          distribution: temurin
+          java-version: 17
+          cache: maven
 
-      - name: Download RU2
-        uses: actions/download-artifact@v4
-        with:
-          name: ru2
+      - name: Build RU3
+        run: mvn -B clean install -pl ru3 -am
 
-      - name: Assemble
-        run: |
-          echo "Assembling..."
-          cat ru1.txt ru2.txt > assembly.txt
-
-      - name: Upload Assembly
+      - name: Upload RU3 Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: assembly
-          path: assembly.txt
+          name: ru3
+          path: ru3/target/*.jar
 
-  # -------------------------------
-  # Installer Job (Final Step)
-  # -------------------------------
+
+  assembly:
+    needs: [build-ru1, build-ru2, build-ru3]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build Assembly
+        run: mvn -B clean install -pl assembly -am
+
 
   installer:
+    needs: assembly
     runs-on: ubuntu-latest
-    needs: assemble
 
     steps:
-      - name: Download Assembly
-        uses: actions/download-artifact@v4
-        with:
-          name: assembly
+      - uses: actions/checkout@v4
 
-      - name: Install
-        run: |
-          echo "Installing..."
-          cat assembly.txt
-          echo "Hello World Pipeline Completed!"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build Installer
+        run: mvn -B clean install -pl installer -am
+
+      - name: Upload Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: installer
+          path: installer/target/*.jar
