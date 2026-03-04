@@ -23,19 +23,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ru1-artifact
-          path: artifacts/ru1
+          path: ru1/target/
 
       - name: Download RU2 Artifact
         uses: actions/download-artifact@v4
         with:
           name: ru2-artifact
-          path: artifacts/ru2
+          path: ru2/target/
 
       - name: Download RU3 Artifact
         uses: actions/download-artifact@v4
         with:
           name: ru3-artifact
-          path: artifacts/ru3
+          path: ru3/target/
 
       - name: Run Assembly
         run: |
