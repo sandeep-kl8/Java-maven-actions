@@ -1,0 +1,32 @@
+name: RU1 Build
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'ru1/**'
+
+jobs:
+  build-ru1:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build RU1
+        run: |
+          mvn -pl ru1 -am clean install
+
+      - name: Upload RU1 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ru1-artifact
+          path: ru1/target/
