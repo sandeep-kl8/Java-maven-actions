@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'ru1/**'
+      - 'ru1/**'  
 
 jobs: 
   build-ru1:
